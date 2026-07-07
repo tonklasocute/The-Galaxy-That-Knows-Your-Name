@@ -594,8 +594,8 @@
             justify-content: center;
             font-size: clamp(28px, 5vw, 42px);
             opacity: 0.3;
-            transform: scale(1);
-            transition: all 0.3s ease;
+            transform: translateY(0.14em) scale(var(--icon-scale, 1));
+            transition: opacity 0.3s ease, transform 0.3s ease;
             pointer-events: none;
         }
         #hold-instruction {
@@ -654,9 +654,9 @@
                             <stop offset="100%" stop-color="rgba(255,255,255,0)"></stop>
                         </radialGradient>
                     </defs>
-                    <path class="heart-bg" d="M16,28.22 C16,28.22 3,20.04 3,11.5 C3,6.36 7.18,3.5 11.5,3.5 C14.34,3.5 15.34,5.18 16,6.17 C16,6.17 16.66,3.5 20.5,3.5 C24.82,3.5 29,6.36 29,11.5 C29,20.04 16,28.22 16,28.22 Z"></path>
-                    <path class="heart-glass-highlight" d="M16,28.22 C16,28.22 3,20.04 3,11.5 C3,6.36 7.18,3.5 11.5,3.5 C14.34,3.5 15.34,5.18 16,6.17 C16,6.17 16.66,3.5 20.5,3.5 C24.82,3.5 29,6.36 29,11.5 C29,20.04 16,28.22 16,28.22 Z" fill="url(#glassHighlight)"></path>
-                    <path class="heart-fill" d="M16,28.22 C16,28.22 3,20.04 3,11.5 C3,6.36 7.18,3.5 11.5,3.5 C14.34,3.5 15.34,5.18 16,6.17 C16,6.17 16.66,3.5 20.5,3.5 C24.82,3.5 29,6.36 29,11.5 C29,20.04 16,28.22 16,28.22 Z"></path>
+                    <path class="heart-bg" d="M16,28.22 C16,28.22 3,20.04 3,11.5 C3,6.36 7.18,3.5 11.5,3.5 C14.34,3.5 15.34,5.18 16,6.17 C16.66,5.18 17.66,3.5 20.5,3.5 C24.82,3.5 29,6.36 29,11.5 C29,20.04 16,28.22 16,28.22 Z"></path>
+                    <path class="heart-glass-highlight" d="M16,28.22 C16,28.22 3,20.04 3,11.5 C3,6.36 7.18,3.5 11.5,3.5 C14.34,3.5 15.34,5.18 16,6.17 C16.66,5.18 17.66,3.5 20.5,3.5 C24.82,3.5 29,6.36 29,11.5 C29,20.04 16,28.22 16,28.22 Z" fill="url(#glassHighlight)"></path>
+                    <path class="heart-fill" d="M16,28.22 C16,28.22 3,20.04 3,11.5 C3,6.36 7.18,3.5 11.5,3.5 C14.34,3.5 15.34,5.18 16,6.17 C16.66,5.18 17.66,3.5 20.5,3.5 C24.82,3.5 29,6.36 29,11.5 C29,20.04 16,28.22 16,28.22 Z"></path>
                 </svg>
                 <div class="heart-icon-inside">♡</div>
 
@@ -1362,7 +1362,7 @@
                     heartFill.style.strokeDashoffset = offset;
 
                     heartIcon.style.opacity = 0.3 + (progress / 100) * 0.7;
-                    heartIcon.style.transform = `scale(${1 + (progress / 100) * 0.3})`;
+                    heartIcon.style.setProperty('--icon-scale', 1 + (progress / 100) * 0.3);
                     heartFill.style.fill = `rgba(255, 50, 120, ${(progress / 100) * 0.4})`;
 
                     // heartbeat speeds up and glow intensifies the longer you hold
@@ -1405,7 +1405,7 @@
                     const offset = 100 - progress;
                     heartFill.style.strokeDashoffset = offset;
                     heartIcon.style.opacity = 0.3 + (progress / 100) * 0.7;
-                    heartIcon.style.transform = `scale(${1 + (progress / 100) * 0.3})`;
+                    heartIcon.style.setProperty('--icon-scale', 1 + (progress / 100) * 0.3);
                     heartFill.style.fill = `rgba(255, 50, 120, ${(progress / 100) * 0.4})`;
                     holdInstruction.textContent = "Hold to enter";
 
