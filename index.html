@@ -550,9 +550,20 @@
             transform: scale(0.95);
         }
         .heart-bg {
-            fill: rgba(255, 255, 255, 0.05);
-            stroke: rgba(255, 255, 255, 0.2);
-            stroke-width: 1.5;
+            fill: rgba(255, 255, 255, 0.06);
+            stroke: rgba(255, 255, 255, 0.35);
+            stroke-width: 1.2;
+        }
+        .heart-glass-highlight {
+            pointer-events: none;
+        }
+        /* pulses faster/bigger the longer you hold, like a heartbeat charging up */
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            50%      { transform: scale(1.09); }
+        }
+        #heart-hold-container.beating .heart-svg {
+            animation: heartBeat 0.7s ease-in-out infinite;
         }
         .heart-fill {
             fill: rgba(255, 50, 120, 0);
@@ -579,6 +590,7 @@
             font-size: 11px !important;
             letter-spacing: 0.3em !important;
             color: rgba(255, 220, 240, 0.6) !important;
+            text-transform: none !important;
             animation: textPulse 1.5s infinite alternate;
         }
         @keyframes textPulse {
@@ -615,19 +627,27 @@
 
     <div id="start-overlay">
         <div id="start-card">
-            <h1>Happy Anniversary</h1>
+            <h1>Dada</h1>
 
             <div id="heart-hold-container">
                 <svg class="heart-svg" viewBox="0 0 32 32">
+                    <defs>
+                        <radialGradient id="glassHighlight" cx="35%" cy="28%" r="55%">
+                            <stop offset="0%" stop-color="rgba(255,255,255,0.55)"></stop>
+                            <stop offset="60%" stop-color="rgba(255,255,255,0.08)"></stop>
+                            <stop offset="100%" stop-color="rgba(255,255,255,0)"></stop>
+                        </radialGradient>
+                    </defs>
                     <path class="heart-bg" d="M16,28.22 C16,28.22 3,20.04 3,11.5 C3,6.36 7.18,3.5 11.5,3.5 C14.34,3.5 15.34,5.18 16,6.17 C16,6.17 16.66,3.5 20.5,3.5 C24.82,3.5 29,6.36 29,11.5 C29,20.04 16,28.22 16,28.22 Z"></path>
+                    <path class="heart-glass-highlight" d="M16,28.22 C16,28.22 3,20.04 3,11.5 C3,6.36 7.18,3.5 11.5,3.5 C14.34,3.5 15.34,5.18 16,6.17 C16,6.17 16.66,3.5 20.5,3.5 C24.82,3.5 29,6.36 29,11.5 C29,20.04 16,28.22 16,28.22 Z" fill="url(#glassHighlight)"></path>
                     <path class="heart-fill" d="M16,28.22 C16,28.22 3,20.04 3,11.5 C3,6.36 7.18,3.5 11.5,3.5 C14.34,3.5 15.34,5.18 16,6.17 C16,6.17 16.66,3.5 20.5,3.5 C24.82,3.5 29,6.36 29,11.5 C29,20.04 16,28.22 16,28.22 Z"></path>
                 </svg>
-                <div class="heart-icon-inside">❤️</div>
+                <div class="heart-icon-inside">♡</div>
 
                 <div class="heart-runner">❤️</div>
             </div>
 
-            <p id="hold-instruction">HOLD HEART TO ENTER</p>
+            <p id="hold-instruction">Hold to enter</p>
             <button id="start-button" style="display:none">ENTER</button>
         </div>
     </div>
@@ -1244,6 +1264,56 @@
             }).catch(() => {});
         }
 
+        // shatters the glass heart into small heart-shaped particles at (x, y)
+        function shatterHeart(x, y) {
+            const c = document.createElement('canvas');
+            c.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;';
+            document.body.appendChild(c);
+            const ctx = c.getContext('2d');
+            c.width = window.innerWidth; c.height = window.innerHeight;
+
+            const colors = ['#ff69b4', '#ff3366', '#ff85c2', '#fff0f8', '#e0a0ff'];
+            const parts = Array.from({ length: 70 }, () => {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 3 + Math.random() * 8;
+                return {
+                    x, y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    r: 3 + Math.random() * 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    opacity: 1,
+                    gravity: 0.12,
+                    tilt: Math.random() * 360,
+                    tiltSpeed: 3 + Math.random() * 5
+                };
+            });
+
+            function draw() {
+                ctx.clearRect(0, 0, c.width, c.height);
+                let alive = false;
+                parts.forEach(p => {
+                    if (p.opacity <= 0) return;
+                    alive = true;
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.tilt * Math.PI / 180);
+                    ctx.fillStyle = p.color; ctx.globalAlpha = p.opacity;
+                    const s = p.r * 0.15;
+                    ctx.beginPath();
+                    for (let a = 0; a <= Math.PI * 2; a += 0.2) {
+                        const hx = 16 * Math.pow(Math.sin(a), 3) * s;
+                        const hy = -(13 * Math.cos(a) - 5 * Math.cos(2 * a) - 2 * Math.cos(3 * a) - Math.cos(4 * a)) * s;
+                        a === 0 ? ctx.moveTo(hx, hy) : ctx.lineTo(hx, hy);
+                    }
+                    ctx.fill();
+                    ctx.restore();
+                    p.x += p.vx; p.y += p.vy; p.vy += p.gravity;
+                    p.tilt += p.tiltSpeed; p.opacity -= 0.02;
+                });
+                if (alive) requestAnimationFrame(draw); else c.remove();
+            }
+            draw();
+        }
+
         function startHolding(e) {
             e.preventDefault();
             if (experienceStarted) return;
@@ -1251,7 +1321,8 @@
             unlockAudio();
 
             clearInterval(holdTimer);
-            holdInstruction.textContent = "CHARGING LOVE...";
+            holdInstruction.textContent = "Charging love...";
+            heartContainer.classList.add('beating');
 
             updateRunnerPosition();
 
@@ -1267,12 +1338,18 @@
                     heartIcon.style.transform = `scale(${1 + (progress / 100) * 0.3})`;
                     heartFill.style.fill = `rgba(255, 50, 120, ${(progress / 100) * 0.4})`;
 
+                    // heartbeat speeds up and glow intensifies the longer you hold
+                    const svg = heartContainer.querySelector('.heart-svg');
+                    svg.style.animationDuration = `${0.7 - (progress / 100) * 0.4}s`;
+                    heartContainer.style.filter = `drop-shadow(0 0 ${8 + (progress / 100) * 40}px rgba(255,51,102,${0.3 + (progress / 100) * 0.6}))`;
+
                     updateRunnerPosition();
                 }
 
                 if (progress >= 100) {
                     clearInterval(holdTimer);
-                    holdInstruction.textContent = "WARPING TO GALAXY! 💕";
+                    heartContainer.classList.remove('beating');
+                    holdInstruction.textContent = "";
 
                     const bgMusic = document.getElementById('backgroundMusic');
                     if (bgMusic) {
@@ -1280,9 +1357,15 @@
                         bgMusic.play().catch(err => console.log("Music play failed:", err));
                     }
 
+                    const rect = heartContainer.getBoundingClientRect();
+                    shatterHeart(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                    heartContainer.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    heartContainer.style.opacity = '0';
+                    heartContainer.style.transform = 'scale(0.4)';
+
                     setTimeout(() => {
                         startExperience();
-                    }, 200);
+                    }, 300);
                 }
             }, intervalTime);
         }
@@ -1290,6 +1373,8 @@
         function stopHolding() {
             if (experienceStarted) return;
             clearInterval(holdTimer);
+            heartContainer.classList.remove('beating');
+            heartContainer.style.filter = '';
 
             holdTimer = setInterval(() => {
                 if (progress > 0) {
@@ -1301,7 +1386,7 @@
                     heartIcon.style.opacity = 0.3 + (progress / 100) * 0.7;
                     heartIcon.style.transform = `scale(${1 + (progress / 100) * 0.3})`;
                     heartFill.style.fill = `rgba(255, 50, 120, ${(progress / 100) * 0.4})`;
-                    holdInstruction.textContent = "HOLD HEART TO ENTER";
+                    holdInstruction.textContent = "Hold to enter";
 
                     updateRunnerPosition();
                 } else {
