@@ -77,6 +77,47 @@
             mask-image: radial-gradient(circle at center, #000 62%, transparent 100%);
             box-shadow: 0 10px 26px rgba(0,0,0,0.4), 0 0 18px rgba(255,105,180,0.2);
         }
+
+        .start-bg-photos { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+        .bg-photo {
+            position: absolute;
+            width: clamp(64px, 9vw, 108px);
+            aspect-ratio: 3 / 4;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.25);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.55);
+            opacity: 0.5;
+            filter: saturate(0.9);
+            animation: cardFloat 6s ease-in-out infinite;
+        }
+        .bg-photo-1 { top: 8%;    left: 6%;   transform: rotate(-12deg); animation-delay: -1s; }
+        .bg-photo-2 { top: 12%;   right: 7%;  transform: rotate(9deg);   animation-delay: -3s; }
+        .bg-photo-3 { bottom: 9%; left: 9%;   transform: rotate(8deg);   animation-delay: -2s; }
+        .bg-photo-4 { bottom: 7%; right: 6%;  transform: rotate(-9deg);  animation-delay: -4.5s; }
+
+        .start-photo-frame {
+            width: clamp(92px, 20vw, 136px);
+            height: clamp(92px, 20vw, 136px);
+            margin: 0 auto 18px;
+            border-radius: 50%;
+            padding: 4px;
+            background: conic-gradient(from 0deg, #ff69b4, #ffd9ec, #ff85c2, #ff69b4);
+            box-shadow: 0 14px 34px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.15);
+            animation: cardFloat 5s ease-in-out infinite;
+        }
+        #start-photo {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            background: #200014;
+            transition: opacity 0.5s ease;
+        }
+        .start-tagline {
+            font-size: clamp(11px,2vw,13px) !important;
+            color: rgba(255,220,240,0.75) !important;
+        }
         #start-card h1 {
             margin: 0 0 14px;
             font-family: 'Anuphan', 'Helvetica Neue', sans-serif;
@@ -115,6 +156,7 @@
         @media (max-width: 640px) {
             #start-card { border-radius: 22px; }
             #start-button { width: min(100%, 280px); }
+            .bg-photo { display: none; }
         }
 
         #message-overlay {
@@ -626,8 +668,19 @@
     <canvas id="bg-canvas"></canvas>
 
     <div id="start-overlay">
+        <div class="start-bg-photos" aria-hidden="true">
+            <img src="dada2.jpg" class="bg-photo bg-photo-1" alt="">
+            <img src="dada4.jpg" class="bg-photo bg-photo-2" alt="">
+            <img src="dada5.jpg" class="bg-photo bg-photo-3" alt="">
+            <img src="dada6.jpg" class="bg-photo bg-photo-4" alt="">
+        </div>
         <div id="start-card">
+            <div class="start-photo-frame">
+                <img id="start-photo" src="dada1.jpg" alt="Dada">
+            </div>
+
             <h1>Dada</h1>
+            <p class="start-tagline">กาแล็กซีที่รู้จักชื่อเธอ</p>
 
             <div id="heart-hold-container">
                 <svg class="heart-svg" viewBox="0 0 32 32">
@@ -1223,6 +1276,18 @@
             }
             window.dispatchEvent(new CustomEvent('experienceStarted'));
         };
+
+        (function cycleStartPhoto() {
+            const photos = ['dada1.jpg', 'dada2.jpg', 'dada3.jpg', 'dada4.jpg', 'dada5.jpg', 'dada6.jpg'];
+            const img = document.getElementById('start-photo');
+            if (!img) return;
+            let i = 0;
+            setInterval(() => {
+                i = (i + 1) % photos.length;
+                img.style.opacity = '0';
+                setTimeout(() => { img.src = photos[i]; img.style.opacity = '1'; }, 500);
+            }, 3200);
+        })();
 
         const heartContainer = document.getElementById('heart-hold-container');
         const heartFill = document.querySelector('.heart-fill');
