@@ -1252,17 +1252,15 @@
 
         const MUSIC_START_SECONDS = 146; // 2:26 into the track
 
-        let audioUnlocked = false;
-        function unlockAudio() {
-            if (audioUnlocked) return;
+        let musicStarted = false;
+        function startMusicAtIntro() {
+            if (musicStarted) return;
+            musicStarted = true;
             const bgMusic = document.getElementById('backgroundMusic');
             if (!bgMusic) return;
-            bgMusic.volume = 0;
-            bgMusic.play().then(() => {
-                bgMusic.pause();
-                bgMusic.volume = 0.5;
-                audioUnlocked = true;
-            }).catch(() => {});
+            bgMusic.currentTime = MUSIC_START_SECONDS;
+            bgMusic.volume = 0.5;
+            bgMusic.play().catch(err => console.log("Music play failed:", err));
         }
 
         // shatters the glass heart into small heart-shaped particles at (x, y)
@@ -1319,14 +1317,7 @@
             e.preventDefault();
             if (experienceStarted) return;
 
-            unlockAudio();
-
-            const bgMusic = document.getElementById('backgroundMusic');
-            if (bgMusic && bgMusic.paused) {
-                bgMusic.currentTime = MUSIC_START_SECONDS;
-                bgMusic.volume = 0.5;
-                bgMusic.play().catch(err => console.log("Music play failed:", err));
-            }
+            startMusicAtIntro();
 
             clearInterval(holdTimer);
             holdInstruction.textContent = "Charging love...";
