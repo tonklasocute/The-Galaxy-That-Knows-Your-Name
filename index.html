@@ -1250,6 +1250,8 @@
             heartRunner.style.top = targetY + 'px';
         }
 
+        const MUSIC_START_SECONDS = 60; // 1:00 into the track
+
         let audioUnlocked = false;
         function unlockAudio() {
             if (audioUnlocked) return;
@@ -1258,7 +1260,6 @@
             bgMusic.volume = 0;
             bgMusic.play().then(() => {
                 bgMusic.pause();
-                bgMusic.currentTime = 0;
                 bgMusic.volume = 0.5;
                 audioUnlocked = true;
             }).catch(() => {});
@@ -1320,6 +1321,13 @@
 
             unlockAudio();
 
+            const bgMusic = document.getElementById('backgroundMusic');
+            if (bgMusic && bgMusic.paused) {
+                bgMusic.currentTime = MUSIC_START_SECONDS;
+                bgMusic.volume = 0.5;
+                bgMusic.play().catch(err => console.log("Music play failed:", err));
+            }
+
             clearInterval(holdTimer);
             holdInstruction.textContent = "Charging love...";
             heartContainer.classList.add('beating');
@@ -1350,12 +1358,6 @@
                     clearInterval(holdTimer);
                     heartContainer.classList.remove('beating');
                     holdInstruction.textContent = "";
-
-                    const bgMusic = document.getElementById('backgroundMusic');
-                    if (bgMusic) {
-                        bgMusic.volume = 0.5;
-                        bgMusic.play().catch(err => console.log("Music play failed:", err));
-                    }
 
                     const rect = heartContainer.getBoundingClientRect();
                     shatterHeart(rect.left + rect.width / 2, rect.top + rect.height / 2);
