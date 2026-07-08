@@ -397,13 +397,28 @@
             display: flex; align-items: center; justify-content: center;
             flex-direction: column; padding: 12px; text-align: center;
         }
+        .fortune-card { --card-hue: 330; }
         .fortune-back {
-            background: linear-gradient(135deg, #2a0020, #1a0030);
-            border: 1px solid rgba(255,105,180,0.4);
+            position: absolute; inset: 0; border-radius: 14px;
+            background:
+                radial-gradient(circle at 1px 1px, hsla(var(--card-hue),80%,75%,0.10) 1px, transparent 0) 0 0/16px 16px,
+                linear-gradient(135deg, hsl(var(--card-hue) 65% 14%), hsl(calc(var(--card-hue) + 20) 60% 8%));
+            border: 1px solid hsla(var(--card-hue),85%,70%,0.4);
             box-shadow: 0 8px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
         }
+        .fortune-back::before, .fortune-back::after {
+            content: '?'; position: absolute;
+            font-family: 'Georgia', serif; font-size: 13px;
+            color: hsla(var(--card-hue),80%,80%,0.45);
+            border: 1px solid hsla(var(--card-hue),80%,80%,0.35);
+            width: 18px; height: 18px; border-radius: 5px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .fortune-back::before { top: 8px; left: 8px; }
+        .fortune-back::after  { bottom: 8px; right: 8px; transform: rotate(180deg); }
         .fortune-back-pattern {
-            font-size: 40px; opacity: 0.6;
+            font-size: 32px; opacity: 0.6;
+            color: hsl(var(--card-hue) 90% 80%);
             animation: cardPulse 2s ease-in-out infinite;
         }
         @keyframes cardPulse {
@@ -411,10 +426,15 @@
             50%      { transform: scale(1.1); opacity: 0.8; }
         }
         .fortune-front {
-            background: linear-gradient(135deg, #3d0030, #200040);
-            border: 1.5px solid rgba(255,105,180,0.7);
-            box-shadow: 0 0 30px rgba(255,105,180,0.4), inset 0 1px 0 rgba(255,255,255,0.12);
+            background: linear-gradient(135deg, hsl(var(--card-hue) 65% 18%), hsl(calc(var(--card-hue) + 20) 60% 10%));
+            border: 1.5px solid hsla(var(--card-hue),85%,70%,0.7);
+            box-shadow: 0 0 30px hsla(var(--card-hue),85%,60%,0.4), inset 0 1px 0 rgba(255,255,255,0.12);
             transform: rotateY(180deg);
+        }
+        .fortune-label {
+            font-size: clamp(8px, 2vw, 9px); letter-spacing: 0.18em;
+            color: hsla(var(--card-hue),80%,85%,0.65);
+            margin-bottom: 6px; text-transform: uppercase;
         }
         .fortune-emoji { font-size: clamp(28px, 8vw, 40px); margin-bottom: 6px; }
         .fortune-text {
@@ -447,14 +467,15 @@
         }
         #fortune-reveal-overlay.show { opacity: 1; pointer-events: auto; }
         #fortune-reveal-card {
+            --card-hue: 330;
             width: min(85vw, 340px);
-            background: linear-gradient(135deg, #3d0030, #200040);
-            border: 1.5px solid rgba(255,105,180,0.8);
+            background: linear-gradient(135deg, hsl(var(--card-hue) 65% 18%), hsl(calc(var(--card-hue) + 20) 60% 10%));
+            border: 1.5px solid hsla(var(--card-hue),85%,70%,0.8);
             border-radius: 20px; padding: 36px 28px;
             text-align: center;
-            box-shadow: 0 0 60px rgba(255,105,180,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+            box-shadow: 0 0 60px hsla(var(--card-hue),85%,60%,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
             transform: scale(0.4);
-            transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
+            transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), background 0.3s ease, border-color 0.3s ease;
         }
         #fortune-reveal-overlay.show #fortune-reveal-card { transform: scale(1); }
         .frev-emoji {
@@ -716,8 +737,8 @@
 
     <!-- Fortune Card overlay -->
     <div id="fortune-overlay">
-        <div id="fortune-title">🃏 Fortune Card</div>
-        <div id="fortune-subtitle">Pick 1 card to reveal your love fortune ✨</div>
+        <div id="fortune-title">🃏 Get to Know You</div>
+        <div id="fortune-subtitle">Pick 1 card and answer it 💬</div>
         <div id="fortune-cards"></div>
         <button id="fortune-replay" style="display:none">🔀 Shuffle again</button>
         <button id="fortune-close">CLOSE ✦</button>
@@ -728,7 +749,7 @@
             <span class="frev-emoji" id="frev-emoji"></span>
             <span class="frev-text-line" id="frev-line1"></span>
             <span class="frev-text-line" id="frev-line2"></span>
-            <button class="frev-btn" id="frev-close">I'll take it 💕</button>
+            <button class="frev-btn" id="frev-close">Got it 💬</button>
         </div>
     </div>
     <audio id="backgroundMusic" loop>
@@ -785,6 +806,15 @@
                 "effect": "normal"
             },
             {
+                "name": "17/06/2026",
+                "message": "The day I started getting to know you 🌱💕",
+                "popupSrc": "dada6.jpg",
+                "src": "",
+                "hue": 340,
+                "pattern": "heart",
+                "effect": "normal"
+            },
+            {
                 "name": "Our Time",
                 "message": "Every second spent with you is the best moment of my life ❤️",
                 "src": "stick1.gif",
@@ -809,7 +839,7 @@
                 "effect": "letter"
             },
             {
-                "name": "🃏 Card of Fate",
+                "name": "🃏 Get to Know You",
                 "message": "",
                 "src": "stick4.gif",
                 "hue": 330,
@@ -2064,6 +2094,7 @@
         });
 
         function showReveal(card) {
+            document.getElementById('fortune-reveal-card').style.setProperty('--card-hue', card.hue ?? 330);
             const lines = card.text.split('\n');
             frevEmoji.textContent = card.emoji;
             frevLine1.textContent = lines[0] || '';
@@ -2083,18 +2114,18 @@
         }
 
         const FORTUNE_POOL = [
-            { emoji: '💆', text: 'One free\nshoulder massage' },
-            { emoji: '👑', text: 'A whole day\nof spoiling you' },
-            { emoji: '🍜', text: 'You pick anything\nfor one meal' },
-            { emoji: '🎬', text: 'Movie night,\nyour choice' },
-            { emoji: '🤗', text: 'A tight hug\nfor 10 seconds' },
-            { emoji: '💌', text: 'I love you more\nthan every star' },
-            { emoji: '🌙', text: 'Go stargazing\ntogether' },
-            { emoji: '🍰', text: 'I\'ll bake you\nsomething sweet' },
-            { emoji: '✈️', text: 'Next day off,\nI\'ll take you somewhere' },
-            { emoji: '💅', text: 'A nail day\ntogether' },
-            { emoji: '📸', text: 'A couple photo\neverywhere we go' },
-            { emoji: '☕', text: 'One coffee\non me' },
+            { emoji: '☕', text: 'Coffee or tea\nperson?', hue: 30 },
+            { emoji: '🌊', text: 'Beach or\nmountains?', hue: 190 },
+            { emoji: '🌙', text: 'Morning person\nor night owl?', hue: 250 },
+            { emoji: '🍜', text: 'What\'s your\ncomfort food?', hue: 15 },
+            { emoji: '📚', text: 'Introvert or\nextrovert?', hue: 270 },
+            { emoji: '🎵', text: 'What song\'s stuck\nin your head?', hue: 320 },
+            { emoji: '✈️', text: 'One place on your\nbucket list?', hue: 200 },
+            { emoji: '😊', text: 'What made you\nsmile today?', hue: 340 },
+            { emoji: '🎨', text: 'Your favorite way\nto relax?', hue: 160 },
+            { emoji: '🎲', text: 'Tell me a random\nfun fact', hue: 285 },
+            { emoji: '🐾', text: 'Cats or\ndogs?', hue: 25 },
+            { emoji: '🍿', text: 'Favorite movie\nof all time?', hue: 355 },
         ];
 
         function shuffle(arr) {
@@ -2121,12 +2152,14 @@
             selected.forEach((card, i) => {
                 const el = document.createElement('div');
                 el.className = 'fortune-card';
+                el.style.setProperty('--card-hue', card.hue ?? 330);
                 el.innerHTML = `
                     <div class="fortune-card-inner">
                         <div class="fortune-back">
-                            <div class="fortune-back-pattern">💕</div>
+                            <div class="fortune-back-pattern">❓</div>
                         </div>
                         <div class="fortune-front">
+                            <div class="fortune-label">Ice Breaker</div>
                             <div class="fortune-emoji">${card.emoji}</div>
                         </div>
                     </div>`;
