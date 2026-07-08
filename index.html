@@ -293,21 +293,26 @@
             position: relative;
             border: 1px solid rgba(255,105,180,0.3);
             border-radius: 12px;
-            overflow: hidden;
+            overflow: visible;
             box-shadow: 0 0 40px rgba(255,105,180,0.3);
             cursor: default;
             touch-action: none;
         }
+        #jigsaw-board-ghost {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            object-fit: cover; border-radius: 12px;
+            opacity: 0.16; pointer-events: none;
+        }
         .jigsaw-piece {
             position: absolute !important;
             cursor: grab;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
-            transition: filter 0.2s;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.65));
+            transition: transform 0.35s ease, filter 0.2s;
             touch-action: none;
             user-select: none;
         }
-        .jigsaw-piece:active { cursor: grabbing; filter: drop-shadow(0 8px 20px rgba(255,105,180,0.8)); }
-        .jigsaw-piece.locked { cursor: default; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+        .jigsaw-piece:active { cursor: grabbing; filter: drop-shadow(0 10px 24px rgba(255,105,180,0.85)); }
+        .jigsaw-piece.locked { cursor: default; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.35)); }
         #jigsaw-progress {
             font-size: 12px; color: rgba(255,180,210,0.8); letter-spacing: 0.1em;
         }
@@ -783,6 +788,7 @@
             },
             {
                 "name": "เก่งมากกกก ❤️",
+                "message": "ต่อครบทุกชิ้นแล้ว เก่งมากจริง ๆ นะ 🧩💖",
                 "src": "stick2.gif",
                 "hue": 320,
                 "pattern": "heart",
@@ -1850,66 +1856,113 @@
             document.getElementById('jigsaw-cancel-btn').style.display = 'inline-block';
 
             const COLS = 3, ROWS = 3;
-            const PIECE_W = 120, PIECE_H = 120;
+            const PIECE_W = 130, PIECE_H = 130;
+            const TAB = Math.round(PIECE_W * 0.22);
+            const CANVAS_W = PIECE_W + TAB * 2, CANVAS_H = PIECE_H + TAB * 2;
             const BOARD_W = PIECE_W * COLS;
             const BOARD_H = PIECE_H * ROWS;
             jigsawBoard.style.width  = BOARD_W + 'px';
             jigsawBoard.style.height = BOARD_H + 'px';
             jigsawBoard.style.background = 'rgba(20,0,15,0.8)';
 
+            const ghost = document.createElement('img');
+            ghost.id = 'jigsaw-board-ghost';
+            ghost.src = 'dada4.jpg?v=1';
+            jigsawBoard.appendChild(ghost);
+
             const gridCanvas = document.createElement('canvas');
             gridCanvas.width = BOARD_W; gridCanvas.height = BOARD_H;
             gridCanvas.style.cssText = 'position:absolute;inset:0;pointer-events:none;';
             const gc = gridCanvas.getContext('2d');
-            gc.strokeStyle = 'rgba(255,105,180,0.2)'; gc.lineWidth = 1;
+            gc.strokeStyle = 'rgba(255,105,180,0.25)'; gc.lineWidth = 1;
             for (let c = 1; c < COLS; c++) { gc.beginPath(); gc.moveTo(c*PIECE_W,0); gc.lineTo(c*PIECE_W,BOARD_H); gc.stroke(); }
             for (let r = 1; r < ROWS; r++) { gc.beginPath(); gc.moveTo(0,r*PIECE_H); gc.lineTo(BOARD_W,r*PIECE_H); gc.stroke(); }
             jigsawBoard.appendChild(gridCanvas);
 
+            // shared tab direction per interior edge so neighboring pieces' knobs interlock visually
+            const vSign = Array.from({length: ROWS}, () => Array.from({length: COLS + 1}, () => Math.random() < 0.5 ? 1 : -1));
+            const hSign = Array.from({length: ROWS + 1}, () => Array.from({length: COLS}, () => Math.random() < 0.5 ? 1 : -1));
+
+            function addEdge(path, x1, y1, x2, y2, sign) {
+                if (!sign) { path.lineTo(x2, y2); return; }
+                const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy);
+                const ux = dx / len, uy = dy / len, px = -uy, py = ux;
+                const bulge = TAB * sign;
+                const pt = t => [x1 + ux * len * t, y1 + uy * len * t];
+                const [ax, ay] = pt(0.35), [bx, by] = pt(0.5), [cx, cy] = pt(0.65);
+                path.lineTo(ax, ay);
+                path.bezierCurveTo(ax + px*bulge*0.7, ay + py*bulge*0.7, bx - ux*len*0.15 + px*bulge, by - uy*len*0.15 + py*bulge, bx + px*bulge, by + py*bulge);
+                path.bezierCurveTo(bx + ux*len*0.15 + px*bulge, by + uy*len*0.15 + py*bulge, cx + px*bulge*0.7, cy + py*bulge*0.7, cx, cy);
+                path.lineTo(x2, y2);
+            }
+
+            function piecePath(top, right, bottom, left) {
+                const p = new Path2D();
+                const x0 = TAB, y0 = TAB, x1 = TAB + PIECE_W, y1 = TAB + PIECE_H;
+                p.moveTo(x0, y0);
+                addEdge(p, x0, y0, x1, y0, top);
+                addEdge(p, x1, y0, x1, y1, right);
+                addEdge(p, x1, y1, x0, y1, bottom);
+                addEdge(p, x0, y1, x0, y0, left);
+                p.closePath();
+                return p;
+            }
+
             const img = new Image();
-                img.src = 'love.jpg?v=1';
+                img.src = 'dada4.jpg?v=1';
                 img.onload = () => {
                 let locked = 0;
-                const SNAP = 28;
+                const SNAP = 26;
+                const scatterPad = 55;
+                const scale = (img.width / COLS) / PIECE_W;
                 const pieces = [];
 
                 for (let r = 0; r < ROWS; r++) {
                     for (let c = 0; c < COLS; c++) {
-                        const cvs = document.createElement('canvas');
-                        cvs.width = PIECE_W; cvs.height = PIECE_H;
-                        const ctx = cvs.getContext('2d');
-
                         const sx = c * (img.width  / COLS);
                         const sy = r * (img.height / ROWS);
                         const sw = img.width  / COLS;
                         const sh = img.height / ROWS;
-                        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, PIECE_W, PIECE_H);
 
-                        ctx.strokeStyle = 'rgba(255,105,180,0.6)';
+                        const top    = r === 0        ? 0 :  hSign[r][c];
+                        const bottom = r === ROWS - 1 ? 0 : -hSign[r+1][c];
+                        const left   = c === 0        ? 0 :  vSign[r][c];
+                        const right  = c === COLS - 1 ? 0 : -vSign[r][c+1];
+                        const path = piecePath(top, right, bottom, left);
+
+                        const cvs = document.createElement('canvas');
+                        cvs.width = CANVAS_W; cvs.height = CANVAS_H;
+                        const ctx = cvs.getContext('2d');
+                        ctx.save();
+                        ctx.clip(path);
+                        ctx.drawImage(img, sx - TAB*scale, sy - TAB*scale, sw + TAB*2*scale, sh + TAB*2*scale, 0, 0, CANVAS_W, CANVAS_H);
+                        ctx.restore();
                         ctx.lineWidth = 2;
-                        ctx.strokeRect(1, 1, PIECE_W-2, PIECE_H-2);
+                        ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+                        ctx.stroke(path);
 
                         const el = cvs;
                         el.className = 'jigsaw-piece';
                         el.setAttribute('data-sx', sx);
                         el.setAttribute('data-sy', sy);
-                        el.style.width  = PIECE_W + 'px';
-                        el.style.height = PIECE_H + 'px';
+                        el.style.width  = CANVAS_W + 'px';
+                        el.style.height = CANVAS_H + 'px';
 
-                        let startX = Math.random() * (BOARD_W - PIECE_W);
-                        let startY = Math.random() * (BOARD_H - PIECE_H);
+                        const targetX = c * PIECE_W - TAB;
+                        const targetY = r * PIECE_H - TAB;
 
-                        startX += (Math.random() - 0.5) * 100;
-                        startY += (Math.random() - 0.5) * 100;
-                        el.style.top  = startY + 'px';
+                        const bx = -scatterPad + Math.random() * (BOARD_W + scatterPad*2 - PIECE_W);
+                        const by = -scatterPad + Math.random() * (BOARD_H + scatterPad*2 - PIECE_H);
+                        el.style.left = (bx - TAB) + 'px';
+                        el.style.top  = (by - TAB) + 'px';
                         el.style.zIndex = 10;
+                        el.style.transform = `rotate(${(Math.random()*30 - 15).toFixed(1)}deg)`;
 
-                        const targetX = c * PIECE_W;
-                        const targetY = r * PIECE_H;
                         let isLocked = false;
 
                         const onDown = (ex, ey) => {
                             if (isLocked) return;
+                            el.style.transform = 'rotate(0deg)';
                             const rect = jigsawBoard.getBoundingClientRect();
                             let dx = ex - (rect.left + parseFloat(el.style.left || 0));
                             let dy = ey - (rect.top + parseFloat(el.style.top || 0));
@@ -1969,16 +2022,22 @@
                         const sy = parseInt(p.getAttribute('data-sy'));
                         const sw = img.width  / COLS;
                         const sh = img.height / ROWS;
-                        pCtx.clearRect(0, 0, PIECE_W, PIECE_H);
-                        pCtx.drawImage(img, sx, sy, sw, sh, 0, 0, PIECE_W, PIECE_H);
+                        pCtx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+                        pCtx.save();
+                        pCtx.beginPath();
+                        pCtx.rect(TAB, TAB, PIECE_W, PIECE_H);
+                        pCtx.clip();
+                        pCtx.drawImage(img, sx, sy, sw, sh, TAB, TAB, PIECE_W, PIECE_H);
+                        pCtx.restore();
                     });
                     if (gridCanvas) gridCanvas.style.display = 'none';
+                    if (ghost) ghost.style.display = 'none';
 
                     runJigsawConfetti();
                 }
             };
             img.onerror = () => {
-                console.error('love.jpg load failed, using fallback');
+                console.error('dada4.jpg load failed, using fallback');
                 img.dispatchEvent(new Event('load'));
             };
         }
