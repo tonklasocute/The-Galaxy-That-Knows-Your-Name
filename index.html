@@ -359,169 +359,289 @@
         }
         .jigsaw-piece.snap-anim { animation: jigsawPop 0.25s ease; }
 
-        /* fortune card */
-        #fortune-overlay {
+        /* wish machine */
+        #wish-overlay {
             position: fixed; inset: 0; z-index: 30;
-            background: radial-gradient(ellipse at center, rgba(30,0,25,0.97), rgba(0,0,0,0.99));
+            background: radial-gradient(ellipse at center, rgba(25,10,40,0.97), rgba(0,0,0,0.99));
             display: flex; flex-direction: column;
-            align-items: center; justify-content: center; gap: 14px;
+            align-items: center; justify-content: center; gap: 10px;
             opacity: 0; pointer-events: none;
             transition: opacity 0.4s ease;
-            padding: 16px; overflow-y: auto;
+            padding: 16px; overflow-y: auto; overflow-x: hidden;
         }
-        #fortune-overlay.show { opacity: 1; pointer-events: auto; }
-        #fortune-title {
-            font-family: 'Georgia', serif; font-size: clamp(18px, 5vw, 24px);
+        #wish-overlay.show { opacity: 1; pointer-events: auto; }
+        #wish-bg-fx { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+        #wish-bg-fx .blob {
+            position: absolute; border-radius: 50%; filter: blur(50px);
+            opacity: 0.35; animation: wishBlobDrift 14s ease-in-out infinite;
+        }
+        #wish-bg-fx .blob:nth-child(1) { width: 220px; height: 220px; background: #ff69b4; top: 10%; left: 8%; animation-delay: 0s; }
+        #wish-bg-fx .blob:nth-child(2) { width: 260px; height: 260px; background: #7a5cff; bottom: 8%; right: 10%; animation-delay: -5s; }
+        #wish-bg-fx .blob:nth-child(3) { width: 180px; height: 180px; background: #5cc9ff; top: 55%; left: 60%; animation-delay: -9s; }
+        @keyframes wishBlobDrift {
+            0%,100% { transform: translate(0,0) scale(1); }
+            50%     { transform: translate(20px,-25px) scale(1.15); }
+        }
+        #wish-bg-fx .spark {
+            position: absolute; color: rgba(255,255,255,0.8); font-size: 12px;
+            animation: wishSparkFloat 5s ease-in-out infinite;
+        }
+        @keyframes wishSparkFloat {
+            0%,100% { transform: translateY(0) scale(1); opacity: 0.3; }
+            50%     { transform: translateY(-22px) scale(1.3); opacity: 1; }
+        }
+        #wish-title {
+            position: relative; z-index: 1;
+            font-family: 'Georgia', serif; font-size: clamp(20px, 5vw, 26px);
             color: #fff; text-shadow: 0 0 20px rgba(255,105,180,0.8);
             letter-spacing: 0.1em;
         }
-        #fortune-subtitle {
-            font-size: clamp(11px, 3vw, 13px); color: rgba(255,180,210,0.7);
-            letter-spacing: 0.08em; text-align: center;
+        #wish-subtitle {
+            position: relative; z-index: 1;
+            font-size: clamp(11px, 3vw, 13px); color: rgba(210,190,255,0.75);
+            letter-spacing: 0.08em; text-align: center; margin-bottom: 6px;
         }
-        #fortune-cards {
-            display: flex; gap: 12px; flex-wrap: wrap;
-            justify-content: center; padding: 10px;
-            max-width: 100vw;
+        #wish-collection-btn {
+            position: absolute; top: 16px; right: 16px; z-index: 2;
+            width: 42px; height: 42px; border-radius: 50%;
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,180,255,0.35);
+            font-size: 19px; cursor: pointer; transition: all 0.25s;
         }
-        .fortune-card {
-            width: clamp(90px, 22vw, 130px);
-            height: clamp(130px, 32vw, 190px);
-            perspective: 800px; cursor: pointer;
-            flex-shrink: 0;
+        #wish-collection-btn:hover { background: rgba(255,105,180,0.2); transform: scale(1.08); }
+
+        /* the machine */
+        #wish-machine {
+            position: relative; z-index: 1;
+            width: 200px; height: 260px;
+            margin: 6px auto 4px;
+            animation: wishIdleFloat 4s ease-in-out infinite;
         }
-        .fortune-card-inner {
-            width: 100%; height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.7s cubic-bezier(0.4,0.2,0.2,1);
+        @keyframes wishIdleFloat {
+            0%,100% { transform: translateY(0); }
+            50%     { transform: translateY(-8px); }
         }
-        .fortune-card.flipped .fortune-card-inner { transform: rotateY(180deg); }
-        .fortune-card.disabled { cursor: default; opacity: 0.5; filter: grayscale(0.5); }
-        .fortune-front, .fortune-back {
-            position: absolute; inset: 0;
-            border-radius: 14px;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            display: flex; align-items: center; justify-content: center;
-            flex-direction: column; padding: 12px; text-align: center;
+        #wish-machine.spinning { animation: wishShake 0.35s ease-in-out infinite; }
+        @keyframes wishShake {
+            0%,100% { transform: translate(0,0) rotate(0deg); }
+            25%     { transform: translate(-4px,0) rotate(-1.2deg); }
+            75%     { transform: translate(4px,0) rotate(1.2deg); }
         }
-        .fortune-card { --card-hue: 330; }
-        .fortune-back {
-            position: absolute; inset: 0; border-radius: 14px;
-            background:
-                radial-gradient(circle at 1px 1px, hsla(var(--card-hue),80%,75%,0.10) 1px, transparent 0) 0 0/16px 16px,
-                linear-gradient(135deg, hsl(var(--card-hue) 65% 14%), hsl(calc(var(--card-hue) + 20) 60% 8%));
-            border: 1px solid hsla(var(--card-hue),85%,70%,0.4);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+        .wish-dome {
+            position: relative; width: 100%; height: 150px;
+            border-radius: 100px 100px 20px 20px;
+            background: linear-gradient(160deg, rgba(255,255,255,0.16), rgba(180,140,255,0.08) 60%, rgba(255,105,180,0.1));
+            border: 2px solid rgba(255,255,255,0.35);
+            box-shadow: 0 0 40px rgba(180,120,255,0.35), inset 0 10px 30px rgba(255,255,255,0.12);
+            overflow: hidden;
         }
-        .fortune-back::before, .fortune-back::after {
-            content: '?'; position: absolute;
-            font-family: 'Georgia', serif; font-size: 13px;
-            color: hsla(var(--card-hue),80%,80%,0.45);
-            border: 1px solid hsla(var(--card-hue),80%,80%,0.35);
-            width: 18px; height: 18px; border-radius: 5px;
-            display: flex; align-items: center; justify-content: center;
+        .wish-glass-shine {
+            position: absolute; top: 6px; left: 18px; width: 34px; height: 90px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.55), transparent);
+            border-radius: 50%; transform: rotate(8deg); opacity: 0.5;
         }
-        .fortune-back::before { top: 8px; left: 8px; }
-        .fortune-back::after  { bottom: 8px; right: 8px; transform: rotate(180deg); }
-        .fortune-back-pattern {
-            font-size: 32px; opacity: 0.6;
-            color: hsl(var(--card-hue) 90% 80%);
-            animation: cardPulse 2s ease-in-out infinite;
+        .wish-capsules { position: absolute; inset: 14px 10px 6px; }
+        .capsule {
+            position: absolute; width: 30px; height: 30px; border-radius: 50%;
+            box-shadow: inset 0 -6px 8px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.3);
+            animation: capsuleJostle 3s ease-in-out infinite;
         }
-        @keyframes cardPulse {
-            0%,100% { transform: scale(1); opacity: 0.5; }
-            50%      { transform: scale(1.1); opacity: 0.8; }
+        .capsule::after {
+            content: ''; position: absolute; inset: 0 0 50% 0;
+            background: rgba(255,255,255,0.55); border-radius: 15px 15px 0 0;
         }
-        .fortune-front {
-            background: linear-gradient(135deg, hsl(var(--card-hue) 65% 18%), hsl(calc(var(--card-hue) + 20) 60% 10%));
-            border: 1.5px solid hsla(var(--card-hue),85%,70%,0.7);
-            box-shadow: 0 0 30px hsla(var(--card-hue),85%,60%,0.4), inset 0 1px 0 rgba(255,255,255,0.12);
-            transform: rotateY(180deg);
+        .capsule.c1 { background: #ff8fc7; top: 55%; left: 8%;  animation-delay: 0s; }
+        .capsule.c2 { background: #9d7bff; top: 30%; left: 40%; animation-delay: -0.6s; }
+        .capsule.c3 { background: #7bd9ff; top: 60%; left: 62%; animation-delay: -1.2s; }
+        .capsule.c4 { background: #ffd97b; top: 15%; left: 68%; animation-delay: -1.8s; }
+        .capsule.c5 { background: #7bffb0; top: 12%; left: 15%; animation-delay: -2.2s; }
+        .capsule.c6 { background: #ff7b7b; top: 45%; left: 25%; animation-delay: -2.8s; }
+        @keyframes capsuleJostle {
+            0%,100% { transform: translate(0,0) rotate(0deg); }
+            50%     { transform: translate(2px,-3px) rotate(6deg); }
         }
-        .fortune-label {
-            font-size: clamp(8px, 2vw, 9px); letter-spacing: 0.18em;
-            color: hsla(var(--card-hue),80%,85%,0.65);
-            margin-bottom: 6px; text-transform: uppercase;
+        #wish-machine.spinning .capsule { animation: capsuleSpin 0.5s linear infinite; }
+        @keyframes capsuleSpin {
+            0%   { transform: translate(0,0) rotate(0deg); }
+            50%  { transform: translate(-3px,4px) rotate(180deg); }
+            100% { transform: translate(0,0) rotate(360deg); }
         }
-        .fortune-emoji { font-size: clamp(28px, 8vw, 40px); margin-bottom: 6px; }
-        .fortune-text {
-            font-size: clamp(10px, 2.8vw, 12px); line-height: 1.5;
-            color: rgba(255,230,240,0.95);
-            font-family: 'Georgia', serif;
+        .wish-base {
+            position: relative; height: 70px; margin-top: -14px;
+            background: linear-gradient(160deg, #3d1a55, #200a30);
+            border: 2px solid rgba(255,180,255,0.3);
+            border-radius: 18px;
+            box-shadow: 0 14px 30px rgba(0,0,0,0.55);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
         }
-        .fortune-card:not(.flipped):not(.disabled):hover .fortune-card-inner {
-            transform: rotateY(20deg) translateY(-6px);
+        .wish-lights { display: flex; gap: 10px; }
+        .wish-lights span {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #ff85c2; opacity: 0.35;
+            animation: wishBlink 1.6s ease-in-out infinite;
+            box-shadow: 0 0 6px rgba(255,133,194,0.6);
+        }
+        .wish-lights span:nth-child(2) { background: #9d7bff; animation-delay: 0.4s; box-shadow: 0 0 6px rgba(157,123,255,0.6); }
+        .wish-lights span:nth-child(3) { background: #7bd9ff; animation-delay: 0.8s; box-shadow: 0 0 6px rgba(123,217,255,0.6); }
+        @keyframes wishBlink { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+        #wish-machine.spinning .wish-lights span { animation: wishBlink 0.3s ease-in-out infinite; opacity: 1; }
+        .wish-chute { width: 44px; height: 10px; border-radius: 6px; background: rgba(0,0,0,0.6); box-shadow: inset 0 2px 4px rgba(0,0,0,0.7); }
+        #wish-shadow {
+            position: absolute; left: 50%; bottom: -14px; width: 130px; height: 22px;
+            transform: translateX(-50%); border-radius: 50%;
+            background: radial-gradient(ellipse at center, rgba(0,0,0,0.55), transparent 70%);
+        }
+        #wish-capsule-drop {
+            position: absolute; left: 50%; top: 226px; width: 30px; height: 30px;
+            margin-left: -15px; border-radius: 50%;
+            background: linear-gradient(160deg, #ffd97b, #ff8fc7);
+            box-shadow: inset 0 -6px 8px rgba(0,0,0,0.25), 0 4px 10px rgba(0,0,0,0.4);
+            opacity: 0; z-index: 2;
+        }
+        #wish-capsule-drop.dropping { animation: capsuleFall 1s cubic-bezier(0.4,0,0.6,1) forwards; }
+        @keyframes capsuleFall {
+            0%   { opacity: 1; transform: translateY(0) scale(1); }
+            55%  { transform: translateY(70px) scale(1); }
+            70%  { transform: translateY(48px) scale(1.05,0.9); }
+            85%  { transform: translateY(64px) scale(1); }
+            92%  { transform: translateY(56px) scale(1.03,0.95); }
+            100% { opacity: 1; transform: translateY(60px) scale(1); }
+        }
+        #wish-capsule-drop.popping { animation: capsulePop 0.5s ease-out forwards; }
+        @keyframes capsulePop {
+            0%   { transform: translateY(60px) scale(1); opacity: 1; }
+            60%  { transform: translateY(60px) scale(1.5); opacity: 1; }
+            100% { transform: translateY(60px) scale(2.2); opacity: 0; }
         }
 
-        /* mystery shake */
-        @keyframes fortuneShake {
-            0%,100% { transform: translateX(0) rotate(0deg); }
-            15%  { transform: translateX(-4px) rotate(-1.5deg); }
-            30%  { transform: translateX(4px)  rotate(1.5deg); }
-            45%  { transform: translateX(-3px) rotate(-1deg); }
-            60%  { transform: translateX(3px)  rotate(1deg); }
-            75%  { transform: translateX(-2px) rotate(-0.5deg); }
+        #wish-spin-dots { position: relative; z-index: 1; display: flex; gap: 8px; font-size: 15px; letter-spacing: 4px; color: #ff9fd0; }
+        #wish-spin-dots .dot.used { color: rgba(255,255,255,0.2); }
+        #wish-spin-btn {
+            position: relative; z-index: 1;
+            background: linear-gradient(135deg, #ff69b4, #a06bff);
+            border: none; color: #fff; padding: 14px 40px;
+            font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600;
+            letter-spacing: 0.15em; border-radius: 999px; cursor: pointer;
+            box-shadow: 0 8px 24px rgba(255,105,180,0.45);
+            transition: transform 0.15s ease, box-shadow 0.3s ease;
         }
-        .fortune-card.shaking { animation: fortuneShake 0.5s ease; }
+        #wish-spin-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255,105,180,0.6); }
+        #wish-spin-btn:active:not(:disabled) { transform: scale(0.94); }
+        #wish-spin-btn:disabled { opacity: 0.35; cursor: default; box-shadow: none; }
+        #wish-limit-msg {
+            position: relative; z-index: 1; font-size: 12px; color: rgba(255,200,230,0.7);
+            letter-spacing: 0.05em; text-align: center;
+        }
+        #wish-close {
+            position: relative; z-index: 1; margin-top: 6px;
+            background: transparent; border: 1px solid rgba(255,150,190,0.5);
+            color: rgba(255,220,230,0.9); padding: 9px 26px;
+            font-family: 'Anuphan', 'Helvetica Neue', sans-serif; font-size: 12px;
+            letter-spacing: 0.2em; border-radius: 999px; cursor: pointer; transition: all 0.3s;
+        }
+        #wish-close:hover { background: rgba(255,105,180,0.2); color: #fff; }
 
-        /* reveal overlay */
-        #fortune-reveal-overlay {
+        /* reward reveal */
+        #wish-reward-overlay {
             position: fixed; inset: 0; z-index: 40;
             display: flex; align-items: center; justify-content: center;
             background: rgba(0,0,0,0.85);
             opacity: 0; pointer-events: none;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.4s ease, background 0.5s ease;
         }
-        #fortune-reveal-overlay.show { opacity: 1; pointer-events: auto; }
-        #fortune-reveal-card {
-            --card-hue: 330;
-            width: min(85vw, 340px);
-            background: linear-gradient(135deg, hsl(var(--card-hue) 65% 18%), hsl(calc(var(--card-hue) + 20) 60% 10%));
-            border: 1.5px solid hsla(var(--card-hue),85%,70%,0.8);
-            border-radius: 20px; padding: 36px 28px;
-            text-align: center;
-            box-shadow: 0 0 60px hsla(var(--card-hue),85%,60%,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
-            transform: scale(0.4);
-            transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), background 0.3s ease, border-color 0.3s ease;
+        #wish-reward-overlay.show { opacity: 1; pointer-events: auto; }
+        #wish-reward-overlay.mythic-bg { background: rgba(0,0,0,0.96); }
+        #wish-reward-card {
+            width: min(85vw, 360px);
+            background: linear-gradient(135deg, #3d0f4a, #1a0a2e);
+            border: 1.5px solid rgba(255,150,190,0.6);
+            border-radius: 24px; padding: 36px 28px; text-align: center;
+            box-shadow: 0 0 60px rgba(255,105,180,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+            transform: scale(0.3); opacity: 0;
+            transition: transform 0.55s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
         }
-        #fortune-reveal-overlay.show #fortune-reveal-card { transform: scale(1); }
-        .frev-emoji {
-            font-size: 48px; display: block;
-            opacity: 0; transform: translateY(10px);
-            transition: opacity 0.4s ease, transform 0.4s ease;
+        #wish-reward-overlay.show #wish-reward-card { transform: scale(1); opacity: 1; }
+        #wish-reward-card.rarity-rare { border-color: rgba(123,217,255,0.7); box-shadow: 0 0 60px rgba(123,217,255,0.4); }
+        #wish-reward-card.rarity-epic { border-color: rgba(157,123,255,0.8); box-shadow: 0 0 70px rgba(157,123,255,0.5); }
+        #wish-reward-card.rarity-legendary {
+            border-color: rgba(255,215,100,0.9);
+            box-shadow: 0 0 90px rgba(255,215,100,0.6), inset 0 1px 0 rgba(255,255,255,0.15);
+            animation: legendaryGlow 1.6s ease-in-out infinite;
         }
-        .frev-text-line {
-            display: block; font-size: clamp(14px,4vw,18px);
-            color: rgba(255,230,240,0.95); font-family: 'Georgia', serif;
-            line-height: 1.6; margin-top: 8px;
-            opacity: 0; transform: translateY(12px);
-            transition: opacity 0.4s ease, transform 0.4s ease;
+        @keyframes legendaryGlow {
+            0%,100% { box-shadow: 0 0 60px rgba(255,215,100,0.5); }
+            50%     { box-shadow: 0 0 100px rgba(255,215,100,0.85); }
         }
-        .frev-btn {
-            margin-top: 24px; display: inline-block;
-            background: transparent;
-            border: 1px solid rgba(255,150,190,0.5);
+        #wish-reward-card.rarity-mythic {
+            border: 2px solid transparent;
+            background-image: linear-gradient(135deg, #2a0a3d, #150822), conic-gradient(from 0deg, #ff69b4, #ffd97b, #7bffb0, #7bd9ff, #9d7bff, #ff69b4);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            animation: mythicSpin 4s linear infinite, mythicZoom 2.5s ease-out;
+        }
+        @keyframes mythicSpin { to { filter: hue-rotate(360deg); } }
+        @keyframes mythicZoom { 0% { transform: scale(0.3); } 60% { transform: scale(1.06); } 100% { transform: scale(1); } }
+        #wish-reward-rarity {
+            font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase;
+            color: rgba(255,220,240,0.6); margin-bottom: 4px;
+        }
+        #wish-reward-emoji { font-size: 46px; display: block; margin-bottom: 8px; }
+        #wish-reward-title {
+            font-family: 'Georgia', serif; font-size: 20px; color: #fff;
+            text-shadow: 0 0 16px rgba(255,105,180,0.6); margin: 0 0 10px;
+        }
+        #wish-reward-desc {
+            font-size: 15px; line-height: 1.6; color: rgba(255,230,240,0.92);
+            font-family: 'Anuphan', 'Helvetica Neue', sans-serif; margin: 0 0 20px;
+        }
+        #wish-reward-photo {
+            width: 100%; max-height: 220px; object-fit: cover;
+            border-radius: 16px; margin-bottom: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        #wish-reward-close {
+            background: transparent; border: 1px solid rgba(255,150,190,0.5);
             color: rgba(255,220,230,0.9); padding: 10px 28px;
             font-family: 'JetBrains Mono', monospace; font-size: 12px;
-            letter-spacing: 0.2em; border-radius: 999px; cursor: pointer;
-            transition: all 0.3s;
-            opacity: 0; transform: translateY(12px);
-            transition: opacity 0.4s ease, transform 0.4s ease, background 0.3s, color 0.3s;
+            letter-spacing: 0.2em; border-radius: 999px; cursor: pointer; transition: all 0.3s;
         }
-        .frev-btn:hover { background: rgba(255,105,180,0.2); color: #fff; }
-        #fortune-replay, #fortune-close {
-            background: transparent;
-            border: 1px solid rgba(255,150,190,0.5);
-            color: rgba(255,220,230,0.9); padding: 10px 28px;
+        #wish-reward-close:hover { background: rgba(255,105,180,0.2); color: #fff; }
+
+        /* collection modal */
+        #wish-collection-overlay {
+            position: fixed; inset: 0; z-index: 45;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.88);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.4s ease;
+            padding: 16px;
+        }
+        #wish-collection-overlay.show { opacity: 1; pointer-events: auto; }
+        #wish-collection-card {
+            width: min(92vw, 460px); max-height: 82vh; overflow-y: auto;
+            background: linear-gradient(160deg, rgba(70,10,45,0.9), rgba(15,0,12,0.95));
+            border: 1px solid rgba(255,150,190,0.3);
+            border-radius: 24px; padding: 28px 24px; text-align: center;
+        }
+        #wish-collection-title { font-family: 'Georgia', serif; font-size: 20px; color: #fff; margin-bottom: 4px; }
+        #wish-collection-count { font-size: 12px; color: rgba(255,180,210,0.7); margin-bottom: 18px; letter-spacing: 0.05em; }
+        .wish-cat { margin-bottom: 18px; text-align: left; }
+        .wish-cat-head { font-size: 13px; color: rgba(255,220,240,0.9); margin-bottom: 8px; letter-spacing: 0.05em; }
+        .wish-cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(74px,1fr)); gap: 8px; }
+        .wish-tile {
+            aspect-ratio: 1; border-radius: 12px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 4px; padding: 6px;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,150,190,0.25);
+            font-size: 22px; text-align: center;
+        }
+        .wish-tile.locked { filter: blur(3px) grayscale(0.6); opacity: 0.5; }
+        .wish-tile span.wish-tile-name { font-size: 8px; letter-spacing: 0.03em; color: rgba(255,230,240,0.85); line-height: 1.2; }
+        #wish-collection-close {
+            margin-top: 8px; background: transparent; border: 1px solid rgba(255,150,190,0.5);
+            color: rgba(255,220,230,0.9); padding: 9px 26px;
             font-family: 'Anuphan', 'Helvetica Neue', sans-serif; font-size: 12px;
-            letter-spacing: 0.2em; border-radius: 999px; cursor: pointer;
-            transition: all 0.3s;
+            letter-spacing: 0.2em; border-radius: 999px; cursor: pointer; transition: all 0.3s;
         }
-        #fortune-replay:hover, #fortune-close:hover {
-            background: rgba(255,105,180,0.2); color: #fff;
-        }
+        #wish-collection-close:hover { background: rgba(255,105,180,0.2); color: #fff; }
 
         /* typewriter cursor */
         #message-text.typing::after {
@@ -746,21 +866,60 @@
         </div>
     </div>
 
-    <!-- Fortune Card overlay -->
-    <div id="fortune-overlay">
-        <div id="fortune-title">🃏 Get to Know You</div>
-        <div id="fortune-subtitle">Pick 1 card and answer it 💬</div>
-        <div id="fortune-cards"></div>
-        <button id="fortune-replay" style="display:none">🔀 Shuffle again</button>
-        <button id="fortune-close">CLOSE ✦</button>
+    <!-- Wish Machine overlay -->
+    <div id="wish-overlay">
+        <div id="wish-bg-fx">
+            <div class="blob"></div><div class="blob"></div><div class="blob"></div>
+        </div>
+        <button id="wish-collection-btn" aria-label="View collection">🎁</button>
+        <div id="wish-title">✨ The Wish Machine</div>
+        <div id="wish-subtitle">Make a wish before you spin.</div>
+
+        <div id="wish-machine">
+            <div class="wish-dome">
+                <div class="wish-capsules">
+                    <span class="capsule c1"></span>
+                    <span class="capsule c2"></span>
+                    <span class="capsule c3"></span>
+                    <span class="capsule c4"></span>
+                    <span class="capsule c5"></span>
+                    <span class="capsule c6"></span>
+                </div>
+                <div class="wish-glass-shine"></div>
+            </div>
+            <div class="wish-base">
+                <div class="wish-lights"><span></span><span></span><span></span></div>
+                <div class="wish-chute"></div>
+            </div>
+            <div id="wish-shadow"></div>
+            <div id="wish-capsule-drop"></div>
+        </div>
+
+        <div id="wish-spin-dots"></div>
+        <button id="wish-spin-btn">🎡 Spin</button>
+        <div id="wish-limit-msg" style="display:none">Come back tomorrow for more wishes.</div>
+        <button id="wish-close">CLOSE ✦</button>
     </div>
-    <!-- Fortune reveal overlay -->
-    <div id="fortune-reveal-overlay">
-        <div id="fortune-reveal-card">
-            <span class="frev-emoji" id="frev-emoji"></span>
-            <span class="frev-text-line" id="frev-line1"></span>
-            <span class="frev-text-line" id="frev-line2"></span>
-            <button class="frev-btn" id="frev-close">Got it 💬</button>
+
+    <!-- Wish reward reveal -->
+    <div id="wish-reward-overlay">
+        <div id="wish-reward-card">
+            <div id="wish-reward-rarity"></div>
+            <span id="wish-reward-emoji"></span>
+            <img id="wish-reward-photo" src="" alt="" style="display:none">
+            <h3 id="wish-reward-title"></h3>
+            <p id="wish-reward-desc"></p>
+            <button id="wish-reward-close">CLOSE ✦</button>
+        </div>
+    </div>
+
+    <!-- Wish Collection modal -->
+    <div id="wish-collection-overlay">
+        <div id="wish-collection-card">
+            <div id="wish-collection-title">Your Collection</div>
+            <div id="wish-collection-count"></div>
+            <div id="wish-collection-body"></div>
+            <button id="wish-collection-close">CLOSE ✦</button>
         </div>
     </div>
     <audio id="backgroundMusic" loop>
@@ -850,12 +1009,12 @@
                 "effect": "letter"
             },
             {
-                "name": "🃏 Get to Know You",
+                "name": "✨ The Wish Machine",
                 "message": "",
                 "src": "stick4.gif",
                 "hue": 330,
                 "pattern": "heart",
-                "effect": "fortune"
+                "effect": "wishmachine"
             }
         ];
 
@@ -2152,145 +2311,234 @@
             };
         }
 
-        const fortuneOverlay = document.getElementById('fortune-overlay');
-        const fortuneCards   = document.getElementById('fortune-cards');
-        const fortuneReplay  = document.getElementById('fortune-replay');
-        const fortuneClose   = document.getElementById('fortune-close');
-        const fortuneRevealOverlay = document.getElementById('fortune-reveal-overlay');
-        const frevEmoji = document.getElementById('frev-emoji');
-        const frevLine1 = document.getElementById('frev-line1');
-        const frevLine2 = document.getElementById('frev-line2');
-        const frevClose = document.getElementById('frev-close');
-        let shakeInterval = null;
+        /* ── Wish Machine ── */
+        const wishOverlay      = document.getElementById('wish-overlay');
+        const wishMachine       = document.getElementById('wish-machine');
+        const wishCapsuleDrop   = document.getElementById('wish-capsule-drop');
+        const wishSpinBtn       = document.getElementById('wish-spin-btn');
+        const wishSpinDots      = document.getElementById('wish-spin-dots');
+        const wishLimitMsg      = document.getElementById('wish-limit-msg');
+        const wishClose         = document.getElementById('wish-close');
+        const wishCollectionBtn = document.getElementById('wish-collection-btn');
 
-        frevClose.addEventListener('click', () => {
-            fortuneRevealOverlay.classList.remove('show');
-        });
+        const wishRewardOverlay = document.getElementById('wish-reward-overlay');
+        const wishRewardCard    = document.getElementById('wish-reward-card');
+        const wishRewardRarity  = document.getElementById('wish-reward-rarity');
+        const wishRewardEmoji   = document.getElementById('wish-reward-emoji');
+        const wishRewardPhoto   = document.getElementById('wish-reward-photo');
+        const wishRewardTitle   = document.getElementById('wish-reward-title');
+        const wishRewardDesc    = document.getElementById('wish-reward-desc');
+        const wishRewardClose   = document.getElementById('wish-reward-close');
 
-        function showReveal(card) {
-            document.getElementById('fortune-reveal-card').style.setProperty('--card-hue', card.hue ?? 330);
-            const lines = card.text.split('\n');
-            frevEmoji.textContent = card.emoji;
-            frevLine1.textContent = lines[0] || '';
-            frevLine2.textContent = lines[1] || '';
-            [frevEmoji, frevLine1, frevLine2, frevClose].forEach(el => {
-                el.style.opacity = '0';
-                el.style.transform = 'translateY(12px)';
-            });
-            fortuneRevealOverlay.classList.add('show');
-            const els = [frevEmoji, frevLine1, frevLine2, frevClose];
-            els.forEach((el, i) => {
-                setTimeout(() => {
-                    el.style.opacity = '1';
-                    el.style.transform = 'translateY(0)';
-                }, 200 + i * 220);
-            });
-        }
+        const wishCollectionOverlay = document.getElementById('wish-collection-overlay');
+        const wishCollectionCount   = document.getElementById('wish-collection-count');
+        const wishCollectionBody    = document.getElementById('wish-collection-body');
+        const wishCollectionClose   = document.getElementById('wish-collection-close');
 
-        const FORTUNE_POOL = [
-            { emoji: '☕', text: 'Coffee or tea\nperson?', hue: 30 },
-            { emoji: '🌊', text: 'Beach or\nmountains?', hue: 190 },
-            { emoji: '🌙', text: 'Morning person\nor night owl?', hue: 250 },
-            { emoji: '🍜', text: 'What\'s your\ncomfort food?', hue: 15 },
-            { emoji: '📚', text: 'Introvert or\nextrovert?', hue: 270 },
-            { emoji: '🎵', text: 'What song\'s stuck\nin your head?', hue: 320 },
-            { emoji: '✈️', text: 'One place on your\nbucket list?', hue: 200 },
-            { emoji: '😊', text: 'What made you\nsmile today?', hue: 340 },
-            { emoji: '🎨', text: 'Your favorite way\nto relax?', hue: 160 },
-            { emoji: '🎲', text: 'Tell me a random\nfun fact', hue: 285 },
-            { emoji: '🐾', text: 'Cats or\ndogs?', hue: 25 },
-            { emoji: '🍿', text: 'Favorite movie\nof all time?', hue: 355 },
+        const WISH_CATEGORIES = {
+            memory:  { label: '📸 Memories' },
+            letter:  { label: '💌 Letters' },
+            mission: { label: '🌸 Missions' },
+            song:    { label: '🎵 Songs' },
+            sticker: { label: '🐰 Stickers' },
+            quote:   { label: '✨ Quotes' },
+        };
+
+        const WISH_REWARDS = [
+            // common (14)
+            { id: 'q1', category: 'quote',   rarity: 'common', emoji: '☁️', title: 'Cute Quote',    desc: "You're doing better than you think." },
+            { id: 'q2', category: 'quote',   rarity: 'common', emoji: '☁️', title: 'Cute Quote',    desc: 'Small steps still count as progress.' },
+            { id: 'q3', category: 'quote',   rarity: 'common', emoji: '🌙', title: 'Mood Card',     desc: 'Let yourself rest today, no guilt.' },
+            { id: 'q4', category: 'quote',   rarity: 'common', emoji: '🌙', title: 'Mood Card',     desc: 'A quiet evening sounds perfect right now.' },
+            { id: 'm1', category: 'mission', rarity: 'common', emoji: '🌸', title: 'Tiny Mission',  desc: 'Send a photo of your current view.' },
+            { id: 'm2', category: 'mission', rarity: 'common', emoji: '🌸', title: 'Tiny Mission',  desc: 'Take a picture of something that makes you smile.' },
+            { id: 'f1', category: 'quote',   rarity: 'common', emoji: '✨', title: 'Daily Fortune', desc: 'Today will surprise you in a good way.' },
+            { id: 'f2', category: 'quote',   rarity: 'common', emoji: '✨', title: 'Daily Fortune', desc: 'Something good is on its way to you.' },
+            { id: 's1', category: 'song',    rarity: 'common', emoji: '🎵', title: 'Song Recommendation', desc: 'Here With Me — d4vd' },
+            { id: 's2', category: 'song',    rarity: 'common', emoji: '🎵', title: 'Song Recommendation', desc: 'Golden Hour — JVKE' },
+            { id: 'k1', category: 'sticker', rarity: 'common', emoji: '🐰', title: 'Lucky Sticker', desc: 'Sleepy Cat' },
+            { id: 'k2', category: 'sticker', rarity: 'common', emoji: '🐰', title: 'Lucky Sticker', desc: 'Little Star' },
+            { id: 'q5', category: 'quote',   rarity: 'common', emoji: '☁️', title: 'Cute Quote',    desc: 'You make ordinary days feel lighter.' },
+            { id: 'm3', category: 'mission', rarity: 'common', emoji: '🌸', title: 'Tiny Mission',  desc: "Drink a glass of water right now, you've earned it." },
+            // rare (8)
+            { id: 'p1', category: 'memory',  rarity: 'rare', emoji: '📸', title: 'Hidden Memory', desc: 'A day worth remembering', photo: 'dada1.jpg' },
+            { id: 'p2', category: 'memory',  rarity: 'rare', emoji: '📸', title: 'Hidden Memory', desc: 'One of my favorite moments', photo: 'dada2.jpg' },
+            { id: 'l1', category: 'letter',  rarity: 'rare', emoji: '💌', title: 'Secret Letter', desc: "Just a small note to say I'm glad you exist." },
+            { id: 'l2', category: 'letter',  rarity: 'rare', emoji: '💌', title: 'Secret Letter', desc: "Even from a distance, you're never far from my mind." },
+            { id: 'f3', category: 'quote',   rarity: 'rare', emoji: '✨', title: 'Daily Fortune', desc: "A message you've been waiting for is close." },
+            { id: 's3', category: 'song',    rarity: 'rare', emoji: '🎵', title: 'Song Recommendation', desc: 'Slow Dancing in the Dark — Joji' },
+            { id: 'k3', category: 'sticker', rarity: 'rare', emoji: '🐰', title: 'Lucky Sticker', desc: 'Shooting Star' },
+            { id: 'q6', category: 'quote',   rarity: 'rare', emoji: '🌙', title: 'Mood Card',     desc: 'Tonight, let the stars do the talking.' },
+            // epic (5)
+            { id: 'p3', category: 'memory',  rarity: 'epic', emoji: '📸', title: 'Hidden Memory', desc: 'This one still makes me smile', photo: 'dada3.jpg' },
+            { id: 'l3', category: 'letter',  rarity: 'epic', emoji: '💌', title: 'Secret Letter', desc: "I don't say it enough, but you matter more than you know." },
+            { id: 'm4', category: 'mission', rarity: 'epic', emoji: '🌸', title: 'Tiny Mission',  desc: 'Look up at the sky tonight and make a wish.' },
+            { id: 's4', category: 'song',    rarity: 'epic', emoji: '🎵', title: 'Song Recommendation', desc: 'Stargazing — Myles Smith' },
+            { id: 'k4', category: 'sticker', rarity: 'epic', emoji: '🐰', title: 'Lucky Sticker', desc: 'Galaxy Bunny' },
+            // legendary (2)
+            { id: 'p4', category: 'memory',  rarity: 'legendary', emoji: '📸', title: 'Hidden Memory', desc: 'The day it all started', photo: 'dada5.jpg' },
+            { id: 'l4', category: 'letter',  rarity: 'legendary', emoji: '💌', title: 'Secret Letter', desc: 'No matter how far the distance, my wish always finds its way to you.' },
+            // mythic (1)
+            { id: 'l5', category: 'letter',  rarity: 'mythic', emoji: '💌', title: 'Secret Letter', desc: "Some wishes are rare, just like this one. I'm endlessly grateful for you." },
         ];
 
-        function shuffle(arr) {
-            const a = [...arr];
-            for (let i = a.length-1; i > 0; i--) {
-                const j = Math.floor(Math.random()*(i+1));
-                [a[i], a[j]] = [a[j], a[i]];
+        const WISH_RARITY_WEIGHTS = { common: 60, rare: 25, epic: 10, legendary: 4, mythic: 1 };
+        const WISH_MAX_SPINS = 3;
+        const WISH_SPIN_KEY = 'wishSpinState';
+        const WISH_COLLECTION_KEY = 'wishCollection';
+
+        function pickRarity() {
+            const roll = Math.random() * 100;
+            let acc = 0;
+            for (const tier of Object.keys(WISH_RARITY_WEIGHTS)) {
+                acc += WISH_RARITY_WEIGHTS[tier];
+                if (roll <= acc) return tier;
             }
-            return a;
+            return 'common';
+        }
+        function pickReward() {
+            const pool = WISH_REWARDS.filter(r => r.rarity === pickRarity());
+            return pool[Math.floor(Math.random() * pool.length)];
         }
 
-        function openFortune() {
-            fortuneCards.innerHTML = '';
-            fortuneReplay.style.display = 'none';
-            fortuneRevealOverlay.classList.remove('show');
-            if (shakeInterval) { clearInterval(shakeInterval); shakeInterval = null; }
-            fortuneOverlay.classList.add('show');
+        function todayStr() { return new Date().toISOString().slice(0, 10); }
+        function getSpinState() {
+            let s = null;
+            try { s = JSON.parse(localStorage.getItem(WISH_SPIN_KEY)); } catch (e) {}
+            if (!s || s.date !== todayStr()) {
+                s = { date: todayStr(), remaining: WISH_MAX_SPINS };
+                localStorage.setItem(WISH_SPIN_KEY, JSON.stringify(s));
+            }
+            return s;
+        }
+        function useSpin() {
+            const s = getSpinState();
+            s.remaining = Math.max(0, s.remaining - 1);
+            localStorage.setItem(WISH_SPIN_KEY, JSON.stringify(s));
+        }
 
-            const count = 5;
-            const selected = shuffle(FORTUNE_POOL).slice(0, count);
-            let opened = false;
-            const cardEls = [];
+        function getCollection() {
+            try { return JSON.parse(localStorage.getItem(WISH_COLLECTION_KEY)) || []; } catch (e) { return []; }
+        }
+        function unlockReward(id) {
+            const c = getCollection();
+            if (!c.includes(id)) { c.push(id); localStorage.setItem(WISH_COLLECTION_KEY, JSON.stringify(c)); }
+        }
 
-            selected.forEach((card, i) => {
-                const el = document.createElement('div');
-                el.className = 'fortune-card';
-                el.style.setProperty('--card-hue', card.hue ?? 330);
-                el.innerHTML = `
-                    <div class="fortune-card-inner">
-                        <div class="fortune-back">
-                            <div class="fortune-back-pattern">❓</div>
-                        </div>
-                        <div class="fortune-front">
-                            <div class="fortune-label">Ice Breaker</div>
-                            <div class="fortune-emoji">${card.emoji}</div>
-                        </div>
-                    </div>`;
+        function renderSpinDots() {
+            const s = getSpinState();
+            wishSpinDots.innerHTML = '';
+            for (let i = 0; i < WISH_MAX_SPINS; i++) {
+                const d = document.createElement('span');
+                d.className = 'dot' + (i >= s.remaining ? ' used' : '');
+                d.textContent = '●';
+                wishSpinDots.appendChild(d);
+            }
+            const canSpin = s.remaining > 0;
+            wishSpinBtn.disabled = !canSpin;
+            wishLimitMsg.style.display = canSpin ? 'none' : 'block';
+        }
 
-                el.addEventListener('mousemove', e => {
-                    if (opened || el.classList.contains('flipped') || el.classList.contains('disabled')) return;
-                    const r = el.getBoundingClientRect();
-                    const x = (e.clientX - r.left) / r.width  - 0.5;
-                    const y = (e.clientY - r.top)  / r.height - 0.5;
-                    el.querySelector('.fortune-card-inner').style.transform =
-                        `rotateY(${x*30}deg) rotateX(${-y*20}deg) translateY(-8px)`;
-                });
-                el.addEventListener('mouseleave', () => {
-                    if (!el.classList.contains('flipped'))
-                        el.querySelector('.fortune-card-inner').style.transform = '';
-                });
+        function openWishMachine() {
+            renderSpinDots();
+            wishOverlay.classList.add('show');
+        }
 
-                el.addEventListener('click', () => {
-                    if (opened || el.classList.contains('disabled')) return;
-                    opened = true;
-                    if (shakeInterval) { clearInterval(shakeInterval); shakeInterval = null; }
-                    const inner = el.querySelector('.fortune-card-inner');
-                    inner.style.transform = '';
-                    requestAnimationFrame(() => { el.classList.add('flipped'); });
-                    setTimeout(() => {
-                        cardEls.forEach(c => { if (c !== el) c.classList.add('disabled'); });
-                        fortuneReplay.style.display = 'block';
-                        showReveal(card);
-                    }, 700);
-                });
+        wishClose.addEventListener('click', () => { wishOverlay.classList.remove('show'); });
 
-                el.style.opacity = '0';
-                el.style.transform = 'translateY(30px)';
-                el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-                fortuneCards.appendChild(el);
-                cardEls.push(el);
+        let wishSpinning = false;
+        wishSpinBtn.addEventListener('click', () => {
+            if (wishSpinning || getSpinState().remaining <= 0) return;
+            wishSpinning = true;
+            wishSpinBtn.disabled = true;
+            wishMachine.classList.add('spinning');
+
+            setTimeout(() => {
+                wishMachine.classList.remove('spinning');
+                useSpin();
+                renderSpinDots();
+                dropCapsule();
+            }, 2200);
+        });
+
+        function dropCapsule() {
+            wishCapsuleDrop.className = '';
+            void wishCapsuleDrop.offsetWidth;
+            wishCapsuleDrop.classList.add('dropping');
+            setTimeout(() => {
+                wishCapsuleDrop.classList.remove('dropping');
+                wishCapsuleDrop.classList.add('popping');
                 setTimeout(() => {
-                    el.style.opacity = '1';
-                    el.style.transform = 'translateY(0)';
-                }, 80 * i);
-            });
-
-            let shakeIdx = 0;
-            shakeInterval = setInterval(() => {
-                if (opened) { clearInterval(shakeInterval); return; }
-                const target = cardEls[Math.floor(Math.random() * cardEls.length)];
-                if (!target || target.classList.contains('flipped')) return;
-                target.classList.add('shaking');
-                setTimeout(() => target.classList.remove('shaking'), 500);
-            }, 1200);
+                    wishCapsuleDrop.classList.remove('popping');
+                    wishSpinning = false;
+                    revealWishReward();
+                }, 500);
+            }, 1000);
         }
 
-        fortuneReplay.addEventListener('click', openFortune);
-        fortuneClose.addEventListener('click', () => {
-            if (shakeInterval) { clearInterval(shakeInterval); shakeInterval = null; }
-            fortuneOverlay.classList.remove('show');
-            fortuneRevealOverlay.classList.remove('show');
+        function revealWishReward() {
+            const reward = pickReward();
+            unlockReward(reward.id);
+
+            wishRewardCard.className = '';
+            wishRewardOverlay.className = '';
+            if (reward.rarity !== 'common') wishRewardCard.classList.add('rarity-' + reward.rarity);
+            if (reward.rarity === 'mythic') wishRewardOverlay.classList.add('mythic-bg');
+            // ponytail: legendary/mythic sound cue skipped, no audio asset provided — add one here if you get an SFX file
+
+            wishRewardRarity.textContent = reward.rarity;
+            wishRewardEmoji.textContent = reward.emoji;
+            wishRewardTitle.textContent = reward.title;
+            wishRewardDesc.textContent = reward.desc;
+
+            if (reward.photo) {
+                wishRewardPhoto.src = reward.photo;
+                wishRewardPhoto.style.display = 'block';
+            } else {
+                wishRewardPhoto.style.display = 'none';
+            }
+
+            wishRewardOverlay.classList.add('show');
+        }
+
+        wishRewardClose.addEventListener('click', () => {
+            wishRewardOverlay.classList.remove('show');
+        });
+
+        function renderWishCollection() {
+            const unlocked = getCollection();
+            wishCollectionCount.textContent = `${unlocked.length} / ${WISH_REWARDS.length} unlocked`;
+            wishCollectionBody.innerHTML = '';
+            Object.keys(WISH_CATEGORIES).forEach(catKey => {
+                const items = WISH_REWARDS.filter(r => r.category === catKey);
+                const unlockedInCat = items.filter(r => unlocked.includes(r.id)).length;
+
+                const section = document.createElement('div');
+                section.className = 'wish-cat';
+                section.innerHTML = `<div class="wish-cat-head">${WISH_CATEGORIES[catKey].label} (${unlockedInCat}/${items.length})</div>`;
+
+                const grid = document.createElement('div');
+                grid.className = 'wish-cat-grid';
+                items.forEach(r => {
+                    const isUnlocked = unlocked.includes(r.id);
+                    const tile = document.createElement('div');
+                    tile.className = 'wish-tile' + (isUnlocked ? '' : ' locked');
+                    tile.innerHTML = isUnlocked
+                        ? `${r.emoji}<span class="wish-tile-name">${r.title}</span>`
+                        : `❔<span class="wish-tile-name">???</span>`;
+                    grid.appendChild(tile);
+                });
+                section.appendChild(grid);
+                wishCollectionBody.appendChild(section);
+            });
+        }
+
+        wishCollectionBtn.addEventListener('click', () => {
+            renderWishCollection();
+            wishCollectionOverlay.classList.add('show');
+        });
+        wishCollectionClose.addEventListener('click', () => {
+            wishCollectionOverlay.classList.remove('show');
         });
 
         function showPlateMessage(plate, idx) {
@@ -2338,8 +2586,8 @@
                 msgCard.classList.add('effect-stars');
                 overlay.classList.add('show');
                 setTimeout(runStars, 300);
-            } else if (plate.effect === 'fortune') {
-                openFortune();
+            } else if (plate.effect === 'wishmachine') {
+                openWishMachine();
             } else if (plate.effect === 'timer') {
                 textEl.textContent = plate.message;
                 countdownWrap.style.display = 'block';
