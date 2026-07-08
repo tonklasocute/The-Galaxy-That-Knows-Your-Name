@@ -1662,7 +1662,7 @@
         let countdownInterval = null;
 
         /* EDIT ME: set this to your own anniversary date */
-        const ANNIVERSARY_DATE = new Date('2024-01-01T00:00:00');
+        const ANNIVERSARY_DATE = new Date('2026-06-17T15:25:00');
 
         function getCountdown() {
             const now  = new Date();
@@ -1679,7 +1679,7 @@
         function renderCountdown() {
             const cd = getCountdown();
             countdownDisplay.innerHTML = `
-                <div class="cd-title" style="width:100%;text-align:center">Together for 💕</div>
+                <div class="cd-title" style="width:100%;text-align:center">Since the day I got to know you 💕</div>
                 <div class="cd-box"><span class="cd-num">${cd.days}</span><span class="cd-label">days</span></div>
                 <div class="cd-box"><span class="cd-num">${pad(cd.hours)}</span><span class="cd-label">hours</span></div>
                 <div class="cd-box"><span class="cd-num">${pad(cd.minutes)}</span><span class="cd-label">minutes</span></div>
