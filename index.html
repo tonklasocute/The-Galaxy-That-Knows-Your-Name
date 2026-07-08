@@ -5,7 +5,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@200;300;400;500;600&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Galaxy Love</title>
 
     <style>
@@ -127,6 +127,7 @@
         }
         @media (max-width: 640px) {
             #start-button { width: min(100%, 280px); }
+            #message-card { padding: 32px 22px; }
         }
 
         #message-overlay {
@@ -136,10 +137,13 @@
             display: flex; align-items: center; justify-content: center;
             z-index: 10; opacity: 0; pointer-events: none;
             transition: opacity 0.6s ease;
+            padding: 16px; overflow-y: auto; overflow-x: hidden;
+            box-sizing: border-box;
         }
         #message-overlay.show { opacity: 1; pointer-events: auto; }
         #message-card {
-            max-width: 560px; padding: 48px 56px; text-align: center;
+            max-width: 560px; width: 100%; padding: 48px 56px; text-align: center;
+            margin: auto;
             transform: translateY(20px) scale(0.95);
             transition: transform 0.6s cubic-bezier(0.2,0.8,0.2,1);
             position: relative;
@@ -294,6 +298,8 @@
             align-items: center; justify-content: center; gap: 16px;
             opacity: 0; pointer-events: none;
             transition: opacity 0.4s ease;
+            padding: 16px; overflow-y: auto; overflow-x: hidden;
+            box-sizing: border-box;
         }
         #jigsaw-overlay.show { opacity: 1; pointer-events: auto; }
         #jigsaw-title {
@@ -402,7 +408,9 @@
             letter-spacing: 0.08em; text-align: center; margin-bottom: 6px;
         }
         #wish-collection-btn {
-            position: absolute; top: 16px; left: 16px; z-index: 2;
+            position: absolute; z-index: 2;
+            top: max(16px, env(safe-area-inset-top));
+            left: max(16px, env(safe-area-inset-left));
             width: 42px; height: 42px; border-radius: 50%;
             background: rgba(255,255,255,0.08); border: 1px solid rgba(255,180,255,0.35);
             font-size: 19px; cursor: pointer; transition: all 0.25s;
@@ -752,7 +760,9 @@
         }
 
         .music-control {
-            position: fixed; top: 20px; right: 20px; z-index: 1000;
+            position: fixed; z-index: 1000;
+            top: max(20px, env(safe-area-inset-top));
+            right: max(20px, env(safe-area-inset-right));
             display: flex; flex-direction: column; align-items: center;
         }
         .music-btn {
@@ -788,8 +798,8 @@
         }
 
         @media (max-width: 768px) {
-            .music-control { right: 15px; }
-            .music-btn { width: 35px; height: 35px; }
+            .music-control { right: max(15px, env(safe-area-inset-right)); }
+            .music-btn { width: 40px; height: 40px; }
             .music-btn svg { width: 22px; height: 22px; }
             .volume-control { width: 100px; margin-top: 8px; }
             .volume-control input { height: 10px; }
@@ -2240,7 +2250,8 @@
             document.getElementById('jigsaw-cancel-btn').style.display = 'inline-block';
 
             const COLS = 3, ROWS = 3;
-            const PIECE_W = 130, PIECE_H = 130;
+            const maxBoardW = Math.min(390, window.innerWidth - 40);
+            const PIECE_W = Math.floor(maxBoardW / COLS), PIECE_H = PIECE_W;
             const TAB = Math.round(PIECE_W * 0.22);
             const CANVAS_W = PIECE_W + TAB * 2, CANVAS_H = PIECE_H + TAB * 2;
             const BOARD_W = PIECE_W * COLS;
