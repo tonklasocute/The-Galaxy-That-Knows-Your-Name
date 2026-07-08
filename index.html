@@ -694,10 +694,10 @@
 
     <!-- Jigsaw overlay -->
     <div id="jigsaw-overlay">
-        <div id="jigsaw-title">🧩 ต่อจิ๊กซอว์ให้ครบ</div>
-        <div id="jigsaw-hint">ลากชิ้นส่วนไปวางให้ถูกตำแหน่ง</div>
+        <div id="jigsaw-title">🧩 Complete the Puzzle</div>
+        <div id="jigsaw-hint">Drag the pieces into place</div>
         <div id="jigsaw-board"></div>
-        <div id="jigsaw-progress">0 / 9 ชิ้น</div>
+        <div id="jigsaw-progress">0 / 9 pieces</div>
 
         <button id="jigsaw-cancel-btn" id="jigsaw-close" style="background: transparent; border: 1px solid rgba(255,150,190,0.5); color: rgba(255,220,230,0.9); padding: 10px 28px; font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.2em; border-radius: 999px; cursor: pointer; transition: all 0.3s; margin-top: 15px;">CLOSE ✦</button>
 
@@ -710,10 +710,10 @@
 
     <!-- Fortune Card overlay -->
     <div id="fortune-overlay">
-        <div id="fortune-title">🃏 การ์ดทำนาย</div>
-        <div id="fortune-subtitle">เลือก 1 ใบ เพื่อเปิดดูดวงแห่งรัก ✨</div>
+        <div id="fortune-title">🃏 Fortune Card</div>
+        <div id="fortune-subtitle">Pick 1 card to reveal your love fortune ✨</div>
         <div id="fortune-cards"></div>
-        <button id="fortune-replay" style="display:none">🔀 สุ่มใหม่</button>
+        <button id="fortune-replay" style="display:none">🔀 Shuffle again</button>
         <button id="fortune-close">CLOSE ✦</button>
     </div>
     <!-- Fortune reveal overlay -->
@@ -722,7 +722,7 @@
             <span class="frev-emoji" id="frev-emoji"></span>
             <span class="frev-text-line" id="frev-line1"></span>
             <span class="frev-text-line" id="frev-line2"></span>
-            <button class="frev-btn" id="frev-close">รับไว้เลย 💕</button>
+            <button class="frev-btn" id="frev-close">I'll take it 💕</button>
         </div>
     </div>
     <audio id="backgroundMusic" loop>
@@ -744,7 +744,7 @@
         window.plates = [
             {
                 "name": "01/01/2024",
-                "message": "แก้ข้อความตรงนี้เป็นความทรงจำของคุณเอง 💖",
+                "message": "Edit this into your own memory 💖",
                 "popupSrc": "love1.jpg",
                 "src": "",
                 "hue": 330,
@@ -752,8 +752,8 @@
                 "effect": "normal"
             },
             {
-                "name": "แก้วันที่ตรงนี้",
-                "message": "แก้ข้อความตรงนี้เป็นความทรงจำของคุณเอง 🌟",
+                "name": "Edit this date",
+                "message": "Edit this into your own memory 🌟",
                 "popupSrc": "love2.jpg",
                 "src": "",
                 "hue": 325,
@@ -761,8 +761,8 @@
                 "effect": "normal"
             },
             {
-                "name": "แก้วันที่ตรงนี้",
-                "message": "แก้ข้อความตรงนี้เป็นความทรงจำของคุณเอง 💖",
+                "name": "Edit this date",
+                "message": "Edit this into your own memory 💖",
                 "popupSrc": "love3.jpg",
                 "src": "",
                 "hue": 335,
@@ -770,8 +770,8 @@
                 "effect": "normal"
             },
             {
-                "name": "แก้วันที่ตรงนี้",
-                "message": "แก้ข้อความตรงนี้เป็นความทรงจำของคุณเอง 💕",
+                "name": "Edit this date",
+                "message": "Edit this into your own memory 💕",
                 "popupSrc": "love4.jpg",
                 "src": "",
                 "hue": 325,
@@ -779,23 +779,23 @@
                 "effect": "normal"
             },
             {
-                "name": "เวลาของเรา",
-                "message": "ทุกวินาทีที่ผ่านไปกับเธอ คือช่วงเวลาที่ดีที่สุดในชีวิต ❤️",
+                "name": "Our Time",
+                "message": "Every second spent with you is the best moment of my life ❤️",
                 "src": "stick1.gif",
                 "hue": 330,
                 "pattern": "heart",
                 "effect": "timer"
             },
             {
-                "name": "เก่งมากกกก ❤️",
-                "message": "ต่อครบทุกชิ้นแล้ว เก่งมากจริง ๆ นะ 🧩💖",
+                "name": "So proud of you ❤️",
+                "message": "You finished every piece — you really did great 🧩💖",
                 "src": "stick2.gif",
                 "hue": 320,
                 "pattern": "heart",
                 "effect": "jigsaw"
             },
             {
-                "name": "💌 จดหมายถึงเธอ",
+                "name": "💌 A Letter to You",
                 "message": "Dear Dada, thank you for still fighting through the tiring days, and for never giving up even when everything feels so heavy. Everything you've done matters, always. On the days you feel like giving up, just know that you're already amazing, and you're never walking this road alone. We believe in you, always. 💌",
                 "src": "stick3.gif",
                 "hue": 335,
@@ -803,7 +803,7 @@
                 "effect": "letter"
             },
             {
-                "name": "🃏 การ์ดดวงใจ",
+                "name": "🃏 Card of Fate",
                 "message": "",
                 "src": "stick4.gif",
                 "hue": 330,
@@ -1679,11 +1679,11 @@
         function renderCountdown() {
             const cd = getCountdown();
             countdownDisplay.innerHTML = `
-                <div class="cd-title" style="width:100%;text-align:center">เราอยู่ด้วยกันมา 💕</div>
-                <div class="cd-box"><span class="cd-num">${cd.days}</span><span class="cd-label">วัน</span></div>
-                <div class="cd-box"><span class="cd-num">${pad(cd.hours)}</span><span class="cd-label">ชั่วโมง</span></div>
-                <div class="cd-box"><span class="cd-num">${pad(cd.minutes)}</span><span class="cd-label">นาที</span></div>
-                <div class="cd-box"><span class="cd-num">${pad(cd.seconds)}</span><span class="cd-label">วินาที</span></div>
+                <div class="cd-title" style="width:100%;text-align:center">Together for 💕</div>
+                <div class="cd-box"><span class="cd-num">${cd.days}</span><span class="cd-label">days</span></div>
+                <div class="cd-box"><span class="cd-num">${pad(cd.hours)}</span><span class="cd-label">hours</span></div>
+                <div class="cd-box"><span class="cd-num">${pad(cd.minutes)}</span><span class="cd-label">minutes</span></div>
+                <div class="cd-box"><span class="cd-num">${pad(cd.seconds)}</span><span class="cd-label">seconds</span></div>
             `;
         }
 
@@ -1850,7 +1850,7 @@
         function openJigsaw(plate) {
             jigsawReveal.style.display = 'none';
             jigsawBoard.innerHTML = '';
-            jigsawProgress.textContent = '0 / 9 ชิ้น';
+            jigsawProgress.textContent = '0 / 9 pieces';
             jigsawOverlay.classList.add('show');
 
             document.getElementById('jigsaw-cancel-btn').style.display = 'inline-block';
@@ -1985,7 +1985,7 @@
                                     el.classList.add('locked', 'snap-anim');
                                     isLocked = true;
                                     locked++;
-                                    jigsawProgress.textContent = `${locked} / 9 ชิ้น`;
+                                    jigsawProgress.textContent = `${locked} / 9 pieces`;
                                     if (locked === ROWS * COLS) onComplete();
                                 }
                                 document.removeEventListener('mousemove', moveM);
@@ -2011,7 +2011,7 @@
                     jigsawRevText.textContent  = plate.message;
                     jigsawReveal.style.display = 'block';
                     jigsawReveal.style.animation = 'cardFloat 4s ease-in-out infinite';
-                    jigsawProgress.textContent = '🎉 ครบแล้ว!';
+                    jigsawProgress.textContent = '🎉 All done!';
 
                     document.getElementById('jigsaw-cancel-btn').style.display = 'none';
 
@@ -2077,18 +2077,18 @@
         }
 
         const FORTUNE_POOL = [
-            { emoji: '💆', text: 'นวดไหล่ฟรี\n1 ครั้ง' },
-            { emoji: '👑', text: 'ตามใจเค้า\n1 วันเต็ม' },
-            { emoji: '🍜', text: 'เลือกกินอะไร\nก็ได้ 1 มื้อ' },
-            { emoji: '🎬', text: 'ดูหนังด้วยกัน\nเลือกเรื่องเอง' },
-            { emoji: '🤗', text: 'กอดแน่นๆ\n10 วินาที' },
-            { emoji: '💌', text: 'รักเธอมากกว่า\nดาวทุกดวง' },
-            { emoji: '🌙', text: 'ออกไปดู\nดาวด้วยกัน' },
-            { emoji: '🍰', text: 'ทำขนม\nให้เธอกิน' },
-            { emoji: '✈️', text: 'วันหยุดนี้\nพาเธอไปเที่ยว' },
-            { emoji: '💅', text: 'ทำเล็บ\nด้วยกันนะ' },
-            { emoji: '📸', text: 'ถ่ายรูปคู่\nทุกที่ที่ไป' },
-            { emoji: '☕', text: 'เลี้ยงกาแฟ\n1 แก้ว' },
+            { emoji: '💆', text: 'One free\nshoulder massage' },
+            { emoji: '👑', text: 'A whole day\nof spoiling you' },
+            { emoji: '🍜', text: 'You pick anything\nfor one meal' },
+            { emoji: '🎬', text: 'Movie night,\nyour choice' },
+            { emoji: '🤗', text: 'A tight hug\nfor 10 seconds' },
+            { emoji: '💌', text: 'I love you more\nthan every star' },
+            { emoji: '🌙', text: 'Go stargazing\ntogether' },
+            { emoji: '🍰', text: 'I\'ll bake you\nsomething sweet' },
+            { emoji: '✈️', text: 'Next day off,\nI\'ll take you somewhere' },
+            { emoji: '💅', text: 'A nail day\ntogether' },
+            { emoji: '📸', text: 'A couple photo\neverywhere we go' },
+            { emoji: '☕', text: 'One coffee\non me' },
         ];
 
         function shuffle(arr) {
